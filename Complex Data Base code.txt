@@ -1,0 +1,74 @@
+from django.db import models
+from datetime import datetime
+
+# Create your models here.
+from django.contrib.auth.models import Permission, User
+
+# Create your models here.
+class Proposals(models.Model):
+    # proposal_id=models.AutoField(primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True)
+    
+    
+    CATEGORY_CHOICES = [
+        ('aries', 'ARIES (33%)'),
+        ('indian', 'Indian Time (60%)'),
+        ('belgian', 'Belgian (7%)'),
+    ]
+        
+    proposal_category = models.CharField ( 
+        max_length=20,
+        choices=CATEGORY_CHOICES,
+        verbose_name='Proposal Category'
+    )
+    
+    proposal_title = models.CharField(max_length=100,default='')
+    proposal_type = models.CharField(max_length=20,default='')
+    target_of_opportunity = models.BooleanField(default='')
+    selected_co_proposers = models.TextField(default='')
+    selected_pi_co_proposers = models.TextField(default='')
+    selected_pi_presenters = models.TextField(default='')
+    # ------------------------------------------------ #
+    abstract form
+    abstract=models.TextField()
+    previous_proposals=models.BooleanField(default='')
+    
+    
+    # --------------------------------------------------#
+    Scheduling request
+    OPTIONS = [
+        ('Bright', 'Bright'),
+        ('Grey', 'Grey'),
+        ('Dark', 'Dark'),
+        ('Time critical observation', 'Time critical observation'),
+        ('Other', 'Other'),
+     ]
+
+    selected_options = models.ManyToManyField(
+        'self',
+        choices=OPTIONS,
+        blank=True,
+        null=True,
+        related_name='related_scheduling_requests'
+    )
+    
+    obs_time_request            = models.IntegerField(default=0)
+    obs_time_unit               = models.CharField(null=True, max_length=10)
+    preferred_date              = models.CharField(null=True, max_length=500)
+    impossible_date             = models.CharField(null=True, max_length=500)
+    justify_scheduling_req      = models.CharField(null=True, max_length=4000)
+
+    # ------------------------------------------------------
+    # list of object 
+    file = models.FileField(upload_to='objects_form/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    
+    # =======================================================
+    # completition status
+    is_completed = models.BooleanField(default=False)
+    
+    
+    
+    def __str__(self):
+        return self.proposal_title
